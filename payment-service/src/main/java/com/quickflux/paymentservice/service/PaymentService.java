@@ -79,4 +79,33 @@ public class PaymentService {
             throw new PaymentCaptureFailedException("Payment capture failed", e);
         }
     }
+
+    @Transactional
+    public void voidPreAuth(UUID preauthId) {
+        log.info("Voiding pre-auth {}", preauthId);
+
+        Payment payment = paymentRepository.findByPreauthId(preauthId)
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found for preauth: " + preauthId));
+
+        String idempotencyKey = "void-" + preauthId.toString();
+        paymentGateway.voidPreAuth(preauthId, idempotencyKey);
+
+        payment.setStatus(PaymentStatus.VOIDED);
+        paymentRepository.save(payment);
+
+        log.info("Pre-auth {} voided", preauthId);
+    }
+
+    @Transactional
+    public void markPaymentAsFailed(UUID preauthId) {
+        log.info("Marking payment as FAILED for pre-auth {}", preauthId);
+
+        Payment payment = paymentRepository.findByPreauthId(preauthId)
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found for preauth: " + preauthId));
+
+        payment.markAsFailed();
+        paymentRepository.save(payment);
+
+        log.info("Payment {} marked as FAILED", payment.getId());
+    }
 }

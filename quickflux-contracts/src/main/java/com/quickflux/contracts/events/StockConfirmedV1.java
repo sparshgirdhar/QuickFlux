@@ -12,7 +12,7 @@ public record StockConfirmedV1(
         Instant timestamp,
         String source,
 
-        UUID orderId,
-        UUID productId,
-        int quantity
+        UUID orderId
+//        UUID productId,
+//        int quantity
 ) implements DomainEvent {}

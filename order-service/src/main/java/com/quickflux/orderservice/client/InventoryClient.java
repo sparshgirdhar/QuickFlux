@@ -26,5 +26,11 @@ public class InventoryClient {
         return response.reservationId();
     }
 
+    public void releaseStock(UUID orderId) {
+        String url = INVENTORY_SERVICE_URL + "/api/inventory/release?orderId=" + orderId;
+        log.info("Calling Inventory Service to release stock: {}", url);
+        restTemplate.postForObject(url, null, Void.class);
+    }
+
     public record ReserveResponse(UUID reservationId) {}
 }

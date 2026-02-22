@@ -56,6 +56,9 @@ public class PaymentEventConsumer {
         } catch (Exception e) {
             log.error("Payment capture failed for order {}: {}", orderId, e.getMessage());
 
+            // IMPORTANT: Mark payment as FAILED in the database
+            paymentService.markPaymentAsFailed(preauthId);
+
             // Publish compensation event
             PaymentFailedV1 failedEvent = new PaymentFailedV1(
                     UUID.randomUUID(),

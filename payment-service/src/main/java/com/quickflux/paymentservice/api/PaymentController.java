@@ -27,4 +27,11 @@ public class PaymentController {
         PreAuthResult result = paymentService.preAuthorizePayment(orderId, amount);
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping("/void")
+    public ResponseEntity<Void> voidPreAuth(@RequestParam UUID preauthId) {
+        log.info("Received void pre-auth request for {}", preauthId);
+        paymentService.voidPreAuth(preauthId);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -22,5 +22,11 @@ public class PaymentClient {
         return restTemplate.postForObject(url, null, PreAuthResult.class);
     }
 
+    public void voidPreAuth(UUID preauthId) {
+        String url = PAYMENT_SERVICE_URL + "/api/payments/void?preauthId=" + preauthId;
+        log.info("Calling Payment Service to void pre-auth: {}", url);
+        restTemplate.postForObject(url, null, Void.class);
+    }
+
     public record PreAuthResult(UUID preauthId, String gatewayReferenceId, String status) {}
 }

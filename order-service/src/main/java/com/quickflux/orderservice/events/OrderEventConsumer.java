@@ -64,7 +64,6 @@ public class OrderEventConsumer {
 
     @KafkaListener(topics = "payment.failed", groupId = "order-service")
     public void handlePaymentFailed(PaymentFailedV1 event) {
-        // Check idempotency
         if (idempotencyService.isAlreadyProcessed(event.eventId())) {
             log.info("Event {} already processed, skipping", event.eventId());
             return;
@@ -73,13 +72,16 @@ public class OrderEventConsumer {
         log.info("Received PaymentFailed event for order {}: {}",
                 event.orderId(), event.reason());
 
-        // Cancel the order
-        orderService.cancelOrder(event.orderId());
+        // Cancel the order (even if it was already confirmed)
+        try {
+            orderService.cancelOrder(event.orderId());
+        } catch (IllegalStateException e) {
+            // Order might be CONFIRMED already, force cancel it
+            log.warn("Order {} already confirmed, forcing cancellation due to payment failure", event.orderId());
+            orderService.forceCancelOrder(event.orderId());
+        }
 
-        // Mark as processed
         idempotencyService.markAsProcessed(event.eventId(), event.eventType());
-
-        // Clean up tracker
         eventTrackers.remove(event.orderId());
     }
 

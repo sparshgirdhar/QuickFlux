@@ -29,5 +29,12 @@ public class InventoryController {
         return ResponseEntity.ok(new ReserveStockResponse(reservationId));
     }
 
+    @PostMapping("/release")
+    public ResponseEntity<Void> releaseStock(@RequestParam UUID orderId) {
+        log.info("Received release stock request for order {}", orderId);
+        inventoryService.releaseReservation(orderId);
+        return ResponseEntity.ok().build();
+    }
+
     public record ReserveStockResponse(UUID reservationId) {}
 }
