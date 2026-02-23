@@ -13,5 +13,6 @@ public record OrderCancelledV1(
         String source,
 
         UUID orderId,
-        String reason
+        String reason,
+        UUID userId
 ) implements DomainEvent {}

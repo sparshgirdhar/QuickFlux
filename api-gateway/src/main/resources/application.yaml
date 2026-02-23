@@ -46,7 +46,10 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "http://localhost:3000"  # Frontend URL
+            allowedOrigins:
+              - "https://www.google.com" # For testing
+              - "http://localhost:3000" # Frontend URL if required in future
+              - "http://localhost:5173"
             allowedMethods:
               - GET
               - POST

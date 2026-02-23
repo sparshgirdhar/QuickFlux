@@ -84,6 +84,46 @@ public class AuthService {
     }
 
     @Transactional
+    public AuthResponse register(String email, String password, String name) {
+        log.info("Registering new user: {}", email);
+
+        // Check if email already exists
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new EmailAlreadyExistsException("Email already registered: " + email);
+        }
+
+        // Hash password
+        String passwordHash = passwordEncoder.encode(password);
+
+        // Create user
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .email(email)
+                .passwordHash(passwordHash)
+                .name(name)
+                .createdAt(Instant.now())
+                .build();
+
+        userRepository.save(user);
+
+        // Generate tokens
+        String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(user.getId());
+
+        saveRefreshToken(user.getId(), refreshToken);
+
+        log.info("User registered successfully: {}", user.getEmail());
+
+        return new AuthResponse(
+                accessToken,
+                refreshToken,
+                user.getId(),
+                user.getEmail(),
+                user.getName()
+        );
+    }
+
+    @Transactional
     public void logout(String refreshToken) {
         refreshTokenRepository.findByToken(refreshToken).ifPresent(token -> {
             token.setRevoked(true);

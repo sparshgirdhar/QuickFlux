@@ -88,7 +88,8 @@ public class InventoryEventConsumer {
                     event.correlationId(),
                     Instant.now(),
                     "inventory-service",
-                    orderId
+                    orderId,
+                    event.userId()
 //                    null,  // We don't have productId in PaymentCaptured, that's OK
 //                    0      // We don't have quantity in PaymentCaptured, that's OK
             );

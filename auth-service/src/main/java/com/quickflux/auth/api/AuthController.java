@@ -5,8 +5,10 @@ import com.quickflux.auth.service.AuthService.AuthResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +40,19 @@ public class AuthController {
         authService.logout(request.refreshToken());
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        log.info("Registration request for email: {}", request.email());
+        AuthResponse response = authService.register(request.email(), request.password(), request.name());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    public record RegisterRequest(
+            @NotBlank @Email String email,
+            @NotBlank @Size(min = 8) String password,
+            @NotBlank String name
+    ) {}
 
     public record LoginRequest(
             @NotBlank @Email String email,

@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: websocket-gateway
+
+  kafka:
+    bootstrap-servers: 129.154.224.41:9092
+    consumer:
+      group-id: websocket-gateway
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.json.trusted.packages: com.quickflux.*
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.type.mapping: "OrderCreated:com.quickflux.contracts.events.OrderCreatedV1,PaymentCaptured:com.quickflux.contracts.events.PaymentCapturedV1,StockConfirmed:com.quickflux.contracts.events.StockConfirmedV1,PaymentFailed:com.quickflux.contracts.events.PaymentFailedV1"
+
+server:
+  port: 8085
+
+jwt:
+  secret: your-256-bit-secret-key-change-this-in-production-minimum-32-characters
+
+logging:
+  level:
+    com.quickflux: DEBUG
+    org.springframework.web.socket: DEBUG

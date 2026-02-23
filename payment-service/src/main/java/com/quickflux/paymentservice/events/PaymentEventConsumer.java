@@ -48,7 +48,8 @@ public class PaymentEventConsumer {
                     Instant.now(),
                     "payment-service",
                     orderId,
-                    event.amount()
+                    event.amount(),
+                    event.userId()
             );
 
             eventPublisher.publish("payment.captured", orderId.toString(), capturedEvent);
@@ -69,7 +70,8 @@ public class PaymentEventConsumer {
                     "payment-service",
                     orderId,
                     "CAPTURE_FAILED: " + e.getMessage(),
-                    event.reservationId()
+                    event.reservationId(),
+                    event.userId()
             );
 
             eventPublisher.publish("payment.failed", orderId.toString(), failedEvent);

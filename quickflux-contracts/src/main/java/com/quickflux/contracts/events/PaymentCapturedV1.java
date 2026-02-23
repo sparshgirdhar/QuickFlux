@@ -13,5 +13,6 @@ public record PaymentCapturedV1(
         String source,
 
         UUID orderId,
-        BigDecimal amount
+        BigDecimal amount,
+        UUID userId
 ) implements DomainEvent {}

@@ -14,5 +14,6 @@ public record PaymentFailedV1(
 
         UUID orderId,
         String reason,
-        UUID reservationId  // NEW - tells Inventory which reservation to release
+        UUID reservationId,
+        UUID userId
 ) implements DomainEvent {}
