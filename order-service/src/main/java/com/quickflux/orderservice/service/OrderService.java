@@ -29,17 +29,18 @@ public class OrderService {
     private final EventPublisher eventPublisher;
 
     // Hardcoded test user for Week 1
-    private static final UUID TEST_USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+//    private static final UUID TEST_USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
-    public UUID createOrder(CreateOrderRequest request) {
-        log.info("Creating order for product {} x {}", request.getProductId(), request.getQuantity());
+    public UUID createOrder(CreateOrderRequest request, UUID userId) {
+        log.info("Creating order for user {} product {} x {}",
+                userId, request.getProductId(), request.getQuantity());
 
-        // Step 1: Calculate total
+        // Calculate total
         BigDecimal totalAmount = request.getUnitPrice()
                 .multiply(BigDecimal.valueOf(request.getQuantity()));
 
-        // Step 2: Create order in CREATED state (in separate transaction)
-        UUID orderId = createOrderInNewTransaction(request, totalAmount);
+        // Create order in CREATED state (in separate transaction)
+        UUID orderId = createOrderInNewTransaction(request, totalAmount, userId);
 
         // Step 3: Phase 1 - Parallel validation calls (REST)
         try {
@@ -55,10 +56,10 @@ public class OrderService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public UUID createOrderInNewTransaction(CreateOrderRequest request, BigDecimal totalAmount) {
+    public UUID createOrderInNewTransaction(CreateOrderRequest request, BigDecimal totalAmount, UUID userId) {
         Order order = Order.builder()
                 .id(UUID.randomUUID())
-                .userId(TEST_USER_ID)
+                .userId(userId)
                 .productId(request.getProductId())
                 .quantity(request.getQuantity())
                 .unitPrice(request.getUnitPrice())
